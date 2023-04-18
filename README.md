@@ -1,16 +1,24 @@
-# cms
+# Company management system
 
-## Project setup
+## 设置项目
 ```
 npm install
 ```
+或使用
+```
+npm i
+```
+### 安装sweetalert
+```
+npm install sweetalert
+```
 
-### Compiles and hot-reloads for development
+### 编译项目并启动热重载
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### 编译项目并生成文件
 ```
 npm run build
 ```
@@ -19,6 +27,3 @@ npm run build
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
