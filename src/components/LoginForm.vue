@@ -37,7 +37,7 @@ export default {
 				    this.showChange = "show";
 					return;
 				}
-				//服务器验证
+				//需要服务器验证
 				swal('成功', '登陆成功!', 'success');
 			}
 
@@ -130,6 +130,7 @@ export default {
 	}
 }
 </script>
+
 
 <template>
 	<div id="signin">
