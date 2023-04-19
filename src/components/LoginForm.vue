@@ -10,6 +10,7 @@ export default {
 			newpassword: '',
 			newpassword2: '',
 			code: '',
+			savepassword: '保存密码',
 			generatedCode: '',
 			showLogin: "show",
 			showFind: "hide",
@@ -18,27 +19,39 @@ export default {
 	},
 	mounted() {
 		this.generateCode();
+		this.getPassword();
 	},
 	methods: {
+		Swal(theTitle, theText, theInfo) {
+			swal({
+				title: theTitle,
+				text: theText,
+				icon: theInfo,
+				button: "好的"
+			});
+		},
 		login() {
 			if (this.checkCode() == false) return;
 			if (this.isValidUsername() == false) {
-				swal('错误', '用户名只能使用字母，数字和下划线!', 'error');
+				this.Swal('错误', '用户名只能使用字母，数字和下划线!', 'error');
 				return;
 			}
 			if (this.username == "" || this.password == "") {
-				swal('错误', '请输入用户名和密码!', 'error');
+				this.Swal('错误', '请输入用户名和密码!', 'error');
+				return;
 			}
 			else {
-				if(this.password=="123456"){
-					swal('注意', '请修改密码!', 'info');
+				if (this.password == "123456") {
+					this.Swal('注意', '请修改密码!', 'info');
 					this.showLogin = "hide";
-				    this.showFind = "hide";
-				    this.showChange = "show";
+					this.showFind = "hide";
+					this.showChange = "show";
 					return;
 				}
 				//需要服务器验证
-				swal('成功', '登陆成功!', 'success');
+				this.Swal('成功', '登陆成功!', 'success');
+
+				//页面跳转
 			}
 
 		},
@@ -69,62 +82,96 @@ export default {
 			if (this.code.toLowerCase() === this.generatedCode.toLowerCase()) {
 				return true;
 			} else {
-				swal('错误', '验证码错误!', 'error');
+				this.Swal('错误', '验证码错误!', 'error');
 				this.generateCode();
 				return false;
 			}
 		},
-		find() {  //点击忘记密码，确认信息
+		savePassword() {
+			if (this.username == "" || this.password == "") {
+				this.Swal('错误', '请输入用户名和密码!', 'error');
+				return;
+			}
+			if (window.localStorage.getItem('savepassword') == '保存密码') {
+				window.localStorage.setItem('username', this.username);
+				window.localStorage.setItem('password', this.password);
+				window.localStorage.setItem('savepassword', '取消保存');
+				this.savepassword = window.localStorage.getItem('savepassword');
+				this.Swal("成功", "您的用户名和密码已保存在本地!", "success");
+			}
+			else {
+				window.localStorage.setItem('username', '');
+				window.localStorage.setItem('password', '');
+				window.localStorage.setItem('savepassword', '保存密码');
+				this.savepassword = window.localStorage.getItem('savepassword');
+				this.Swal("成功", "您保存的用户名和密码已清空!", "success");
+			}
+
+		},
+		getPassword() {
+			this.username = window.localStorage.getItem('username');
+			this.password = window.localStorage.getItem('password');
+			if ( window.localStorage.getItem == '取消保存' ) {
+				this.savepassword = window.localStorage.getItem('savepassword');
+				return;
+			}
+			else{
+				window.localStorage.setItem('savepassword', '保存密码');
+				this.savepassword = window.localStorage.getItem('savepassword');
+			}
+			
+		},
+		switchShow(show){
 			this.showLogin = "hide";
-			this.showFind = "show";
+			this.showFind = "hide";
 			this.showChange = "hide";
+			if (show=='showLogin')this.showLogin = "show";
+			if (show=='showFind')this.showFind = "show";
+			if (show=='showChange')this.showChange = "show";
+		},
+		find() {  //点击忘记密码，确认信息
+			this.switchShow('showFind');
 		},
 		next() {  //点击下一步，修改密码
 			if (this.username == "" || this.idCard == "") {
-				swal('错误', '请输入用户名和姓名!', 'error');
+				this.Swal('错误', '请输入用户名和姓名!', 'error');
 				return;
 			}
 			if (this.isValidIDNumber() == false) {
-				swal('错误', '身份证格式错误!', 'error');
+				this.Swal('错误', '身份证格式错误!', 'error');
 				return;
 			}
 			if (this.newpassword == "123456") {
-				swal('错误', '不能和初始密码相同!', 'error');
+				this.Swal('错误', '不能和初始密码相同!', 'error');
 				return;
 			}
 			else {
 				//服务器接口
 				this.idCard = '';
 				this.truename = '';
-				this.showLogin = "hide";
-				this.showFind = "hide";
-				this.showChange = "show";
+				this.switchShow('showChange');
 			}
-
-
 		},
 		change() {  //点击确认，回到登录界面
-			if(this.newpassword==''|| this.newpassword2==''){
-				swal('错误', '请输入新密码!', 'error');
+			if (this.newpassword == '' || this.newpassword2 == '') {
+				this.Swal('错误', '请输入新密码!', 'error');
 				return;
 			}
-			if(this.newpassword=='123456'){
-				swal('错误', '不可使用初始密码!', 'error');
+			if (this.newpassword == '123456') {
+				this.Swal('错误', '不可使用初始密码!', 'error');
 				return;
 			}
-			if(this.newpassword===this.newpassword2){
-				swal('成功', '修改成功!', 'success');
+			if (this.newpassword === this.newpassword2) {
+				this.Swal('成功', '修改成功!', 'success');
 				this.password = '';
 				this.code = '';
 				this.newpassword = '';
 				this.newpassword2 = '';
 				this.generateCode();
-				this.showLogin = "show";
-			    this.showFind = "hide";
-			    this.showChange = "hide";
+				this.switchShow('showLogin')
 			}
-			else{
-				swal('错误', '两次密码输入不一致!', 'error');
+			else {
+				this.Swal('错误', '两次密码输入不一致!', 'error');
 			}
 		},
 	}
@@ -145,14 +192,17 @@ export default {
 				placeholder="请输入验证码" />
 			<canvas :class="showLogin" ref="canvas" @click="generateCode"></canvas>
 			<button :class="showLogin" @click="login">登录</button>
-			<span :class="showLogin" @click="find">忘记密码？</span>
+			<span id="bcmm" :class="showLogin" @click="savePassword">{{ savepassword }}</span>
+			<span id="wjmm" :class="showLogin" @click="find">忘记密码？</span>
 			<input :class="showFind" @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">
 			<input :class="showFind" @keyup.enter="next" v-model="truename" type="text" placeholder="请输入真实姓名">
 			<input :class="showFind" @keyup.enter="next" v-model="idCard" type="text" placeholder="请输入身份证号">
 			<button :class="showFind" @click="next">下一步</button>
-			<input :class="showChange" @keyup.enter="change" v-model="newpassword" type="password" placeholder="请输入新密码">
-			<input :class="showChange" @keyup.enter="change" v-model="newpassword2" type="password" placeholder="请再次输入新密码">
+			<button :class="showFind" @click="switchShow('showLogin')">返回</button>
+			<input style="margin-top: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword" type="password" placeholder="请输入新密码">
+			<input style="margin-bottom: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword2" type="password" placeholder="请再次输入新密码">
 			<button :class="showChange" @click="change">确认</button>
+			<button :class="showChange" @click="switchShow('showFind')">返回</button>
 
 		</div>
 	</div>
@@ -165,6 +215,7 @@ h3 {
 }
 
 input {
+	border-radius: 20px;
 	display: inline-block;
 	width: 250px;
 	height: 40px;
@@ -186,16 +237,39 @@ button {
 	border: none;
 	background-color: #41b883;
 	color: #fff;
-	font-size: 16px;
-	margin-bottom: 5px;
+	font-size: 18px;
+	margin-bottom: 10px;
+	transition: all 0.2s ease-in-out;
+	border-radius: 20px;
 }
 
-span {
+button:hover {
+	background-color: #2fd188;
+	transform: scale(1.1);
 	cursor: pointer;
 }
 
+button:active {
+	background-color: #277351;
+	transform: scale(1.1);
+}
+
+span {
+	width:115px;
+	height: 30px;
+	font-size: 16px;
+	line-height: 30px;
+	display:inline-block;
+	color: #fff;
+	background-color: #41b883;
+	border-radius: 20px;
+	transition: all 0.2s ease-in-out;
+}
+
 span:hover {
-	color: #41b883;
+	cursor: pointer;
+    background-color: #2fd188;
+	transform: scale(1.1);
 }
 
 div#signin {
@@ -203,7 +277,7 @@ div#signin {
 	background-color: aliceblue;
 	border-radius: 20px;
 	width: 300px;
-	height: 320px;
+	height: 335px;
 	position: absolute;
 	left: 50%;
 	top: 50%;
@@ -223,27 +297,12 @@ body {
 	height: 100%;
 }
 
-button {
-	transition: all 0.2s ease-in-out;
-	border-radius: 20px;
-}
-
-button:hover {
-	background-color: #2fd188;
-	transform: scale(1.1);
-	cursor: pointer;
-}
-
-button:active {
-	background-color: #277351;
-	transform: scale(1.1);
-}
-
 .swal-footer {
 	text-align: center;
 }
 
 canvas {
+	border-radius: 20px;
 	width: 80px;
 	height: 40px;
 	text-align: right;
@@ -257,11 +316,19 @@ canvas {
 	vertical-align: middle;
 	/* 千万别删这个 */
 }
-.swal-button{
+
+.swal-button {
 	padding: 0;
 }
-.hide{
+
+.hide {
 	display: none;
+}
+#bccm{
+	margin-right: 20px;
+}
+#wjmm{
+	margin-left:20px;
 }
 </style>
 
