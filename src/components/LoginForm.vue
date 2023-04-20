@@ -30,7 +30,7 @@ export default {
 				button: "好的"
 			});
 		},
-		login() {
+		async login() {
 			if (this.checkCode() == false) return;
 			if (this.isValidUsername() == false) {
 				this.Swal('错误', '用户名只能使用字母，数字和下划线!', 'error');
@@ -41,32 +41,23 @@ export default {
 				return;
 			}
 			else {
-				if (this.password == "123456") {
-					this.Swal('注意', '请修改密码!', 'info');
-					this.showLogin = "hide";
-					this.showFind = "hide";
-					this.showChange = "show";
-					return;
+				const result = await this.xlogin();
+				if (result) {
+					if (this.password == "123456") {
+						this.Swal('注意', '请修改密码!', 'info');
+						this.showLogin = "hide";
+						this.showFind = "hide";
+						this.showChange = "show";
+						return;
+					}
+					this.Swal("成功", "您已成功登录", "success")
+					//window.open('/dashboard', '_self');
 				}
-				//需要服务器验证
-				this.Swal('成功', '登陆成功!', 'success');
-
-				//页面跳转
 			}
 
 		},
-		async test() {
-			const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-				method: 'POST',
-				headers:{},
-				 body: JSON.stringify({title:'111'})
-			});
-			const data = await response.json();
-
-				console.log(data);
-		},
 		async xlogin() {
-			const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+			const response = await fetch('https://www.fastmock.site/mock/190b43d54318fbf3326b993eb7ca66d0/login/api/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -75,12 +66,14 @@ export default {
 					username: this.username,
 					password: this.password
 				})
-			});
+			})
 			const data = await response.json();
-			if (data.success) {
-				// 登录成功，更新应用程序状态
+			if (data.code == 200) {
+				return true;
 			} else {
 				console.log(data);
+				this.Swal("失败", data.code + ":" + data.desc, 'error');
+				return false;
 			}
 		},
 		isValidUsername() {
@@ -219,7 +212,7 @@ export default {
 			<input :class="showLogin" style="width:150px;" @keyup.enter="login" type="text" v-model="code"
 				placeholder="请输入验证码" />
 			<canvas :class="showLogin" ref="canvas" @click="generateCode"></canvas>
-			<button :class="showLogin" @click="test">登录</button>
+			<button :class="showLogin" @click="login">登录</button>
 			<span id="bcmm" :class="showLogin" @click="savePassword">{{ savepassword }}</span>
 			<span id="wjmm" :class="showLogin" @click="find">忘记密码？</span>
 			<input :class="showFind" @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">

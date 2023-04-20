@@ -1,10 +1,16 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
   transpileDependencies: true,
-  
-})
+});
 module.exports = {
   devServer: {
-    allowedHosts: 'all'
-  }
-}
+    allowedHosts: "all",
+  },
+};
+// module.exports = {
+//   devServer: {
+//     host: "localhost",
+//     port: 8080,
+//     proxy: { "/login": { target: "http://www.imooc.com" } },
+//   },
+// };
