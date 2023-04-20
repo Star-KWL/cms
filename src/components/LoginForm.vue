@@ -32,10 +32,10 @@ export default {
 		},
 		async login() {
 			if (this.checkCode() == false) return;
-			if (this.isValidUsername() == false) {
-				this.Swal('错误', '用户名只能使用字母，数字和下划线!', 'error');
-				return;
-			}
+			// if (this.isValidUsername() == false) {
+			// 	this.Swal('错误', '用户名只能使用字母，数字和下划线!', 'error');
+			// 	return;
+			// }
 			if (this.username == "" || this.password == "") {
 				this.Swal('错误', '请输入用户名和密码!', 'error');
 				return;
@@ -76,10 +76,10 @@ export default {
 				return false;
 			}
 		},
-		isValidUsername() {
-			const pattern = /^[a-zA-Z0-9_]+$/;
-			return pattern.test(this.username);
-		},
+		// isValidUsername() {
+		// 	const pattern = /^[a-zA-Z0-9_]+$/;
+		// 	return pattern.test(this.username);
+		// },
 		isValidIDNumber() {
 			const pattern = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
 			return pattern.test(this.idCard);
