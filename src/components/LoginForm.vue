@@ -3,26 +3,26 @@ import swal from 'sweetalert';
 export default {
 	data() {
 		return {
-			username: '',
-			password: '',
-			idCard: '',
-			realname: '',
-			newpassword: '',
-			newpassword2: '',
-			code: '',
-			savepassword: '保存密码',
-			generatedCode: '',
-			showLogin: "show",
-			showFind: "hide",
-			showChange: "hide",
+			username: '',  //用户名
+			password: '',  //密码
+			idCard: '',  //身份证
+			realname: '',  //真实姓名
+			newpassword: '',  //新密码
+			newpassword2: '',  //新密码2
+			code: '',  //输入的验证码
+			savepassword: '保存密码',  //保存密码
+			generatedCode: '',  //要求的验证码
+			showLogin: "show",  //是否显示登录界面
+			showFind: "hide",  //验证界面
+			showChange: "hide",  //修改界面
 		}
 	},
 	mounted() {
-		this.generateCode();
-		this.getPassword();
+		this.generateCode(); //获取验证码
+		this.getPassword();  //获取保存的密码
 	},
 	methods: {
-		Swal(theTitle, theText, theInfo) {
+		Swal(theTitle, theText, theInfo) { //把swal的"OK"改成“好的”
 			swal({
 				title: theTitle,
 				text: theText,
@@ -30,24 +30,19 @@ export default {
 				button: "好的"
 			});
 		},
-		async login() {
-			if (this.checkCode() == false) return;
-			// if (this.isValidUsername() == false) {
-			// 	this.Swal('错误', '用户名只能使用字母，数字和下划线!', 'error');
-			// 	return;
-			// }
+		async login() {  //登录方法，服务器端验证放在xlogin中
 			if (this.username == "" || this.password == "") {
 				this.Swal('错误', '请输入用户名和密码!', 'error');
 				return;
 			}
+			if (this.checkCode() == false) return;
 			else {
+				//result是验证结果
 				const result = await this.xlogin();
 				if (result) {
 					if (this.password == "123456") {
 						this.Swal('注意', '请修改密码!', 'info');
-						this.showLogin = "hide";
-						this.showFind = "hide";
-						this.showChange = "show";
+						this.switchShow('showChange');
 						return;
 					}
 					this.Swal("成功", "您已成功登录", "success")
@@ -56,8 +51,9 @@ export default {
 			}
 
 		},
-		async xlogin() {
-			const response = await fetch('https://www.fastmock.site/mock/190b43d54318fbf3326b993eb7ca66d0/login/api/login', {
+		async xlogin() {  //调用接口进行用户名和密码验证
+			const response = 
+			await fetch('https://www.fastmock.site/mock/190b43d54318fbf3326b993eb7ca66d0/login/api/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -80,11 +76,11 @@ export default {
 		// 	const pattern = /^[a-zA-Z0-9_]+$/;
 		// 	return pattern.test(this.username);
 		// },
-		isValidIDNumber() {
+		isValidIDNumber() {  //判断身份证号格式是否正确
 			const pattern = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
 			return pattern.test(this.idCard);
 		},
-		generateCode() {
+		generateCode() {  //刷新验证码
 			const canvas = this.$refs.canvas;
 			const ctx = canvas.getContext('2d');
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -99,7 +95,7 @@ export default {
 			}
 			this.generatedCode = code;
 		},
-		checkCode() {
+		checkCode() {  //校验验证码
 			if (this.code.toLowerCase() === this.generatedCode.toLowerCase()) {
 				return true;
 			} else {
@@ -108,7 +104,7 @@ export default {
 				return false;
 			}
 		},
-		savePassword() {
+		savePassword() {  //保存密码
 			if (this.username == "" || this.password == "") {
 				this.Swal('错误', '请输入用户名和密码!', 'error');
 				return;
@@ -127,18 +123,14 @@ export default {
 			}
 
 		},
-		getPassword() {
+		getPassword() {  //获取已保存的密码
 			if (this.$cookies.isKey('username') && this.$cookies.isKey('password')) {
 				this.username = this.$cookies.get('username');
 				this.password = this.$cookies.get('password');
 				this.savepassword = '取消保存';
-			} else {
-				return;
-				// 用户名和密码未保存
-			}
-
+			} 
 		},
-		switchShow(show) {
+		switchShow(show) {  //切换登录，验证，修改密码界面
 			this.showLogin = "hide";
 			this.showFind = "hide";
 			this.showChange = "hide";
@@ -149,7 +141,7 @@ export default {
 		find() {  //点击忘记密码，确认信息
 			this.switchShow('showFind');
 		},
-		async next() {  //点击下一步，修改密码
+		async next() {  //点击下一步，验证身份证和姓名，进入修改密码界面
 			if (this.username == "" || this.idCard == "") {
 				this.Swal('错误', '请输入用户名和姓名!', 'error');
 				return;
@@ -166,14 +158,17 @@ export default {
 				//服务器接口
 				const result = await this.xcheck();
 				if (result) {
-					this.Swal("成功", "修改成功，请等待管理员审核！", "success")
-					this.idCard = '';
-					this.realname = '';
+					this.Swal("成功", "验证成功!", "success")
 					this.switchShow('showChange');
+				}
+				else
+				{
+					//报错信息在xcheck中处理，不在这里呈现
+					return;
 				}
 			}
 		},
-		async xcheck() {
+		async xcheck() {  //校验身份证，姓名
 			const response = await fetch('', {
 				method: 'POST',
 				headers: {
@@ -194,7 +189,7 @@ export default {
 				return false;
 			}
 		},
-		change() {  //点击确认，回到登录界面
+		async change() {  //点击确认，向服务端发送修改密码请求，然后回到登录界面
 			if (this.newpassword == '' || this.newpassword2 == '') {
 				this.Swal('错误', '请输入新密码!', 'error');
 				return;
@@ -203,7 +198,8 @@ export default {
 				this.Swal('错误', '不可使用初始密码!', 'error');
 				return;
 			}
-			if (this.newpassword === this.newpassword2) {
+			const result = await this.xcheck(); //再次验证身份证和姓名，增加安全性
+			if (this.newpassword === this.newpassword2 && result) {
 				this.Swal('成功', '修改请求已发送，请等待管理员审核!', 'success');
 				this.password = '';
 				this.code = '';
