@@ -6,7 +6,7 @@ export default {
 			username: '',
 			password: '',
 			idCard: '',
-			truename: '',
+			realname: '',
 			newpassword: '',
 			newpassword2: '',
 			code: '',
@@ -51,7 +51,7 @@ export default {
 						return;
 					}
 					this.Swal("成功", "您已成功登录", "success")
-					//window.open('/dashboard', '_self');
+					window.open('/dashboard', '_self');
 				}
 			}
 
@@ -113,32 +113,28 @@ export default {
 				this.Swal('错误', '请输入用户名和密码!', 'error');
 				return;
 			}
-			if (window.localStorage.getItem('savepassword') == '保存密码') {
-				window.localStorage.setItem('username', this.username);
-				window.localStorage.setItem('password', this.password);
-				window.localStorage.setItem('savepassword', '取消保存');
-				this.savepassword = window.localStorage.getItem('savepassword');
+			if (this.savepassword == '保存密码') {
+				this.$cookies.set('username', this.username, '14d')
+				this.$cookies.set('password', this.password, '14d')
+				this.savepassword = '取消保存';
 				this.Swal("成功", "您的用户名和密码已保存在本地!", "success");
 			}
 			else {
-				window.localStorage.setItem('username', '');
-				window.localStorage.setItem('password', '');
-				window.localStorage.setItem('savepassword', '保存密码');
-				this.savepassword = window.localStorage.getItem('savepassword');
+				this.$cookies.remove('username')
+				this.$cookies.remove('password')
+				this.savepassword = '保存密码';
 				this.Swal("成功", "您保存的用户名和密码已清空!", "success");
 			}
 
 		},
 		getPassword() {
-			this.username = window.localStorage.getItem('username');
-			this.password = window.localStorage.getItem('password');
-			if (window.localStorage.getItem == '取消保存') {
-				this.savepassword = window.localStorage.getItem('savepassword');
+			if (this.$cookies.isKey('username') && this.$cookies.isKey('password')) {
+				this.username = this.$cookies.get('username');
+				this.password = this.$cookies.get('password');
+				this.savepassword = '取消保存';
+			} else {
 				return;
-			}
-			else {
-				window.localStorage.setItem('savepassword', '保存密码');
-				this.savepassword = window.localStorage.getItem('savepassword');
+				// 用户名和密码未保存
 			}
 
 		},
@@ -153,7 +149,7 @@ export default {
 		find() {  //点击忘记密码，确认信息
 			this.switchShow('showFind');
 		},
-		next() {  //点击下一步，修改密码
+		async next() {  //点击下一步，修改密码
 			if (this.username == "" || this.idCard == "") {
 				this.Swal('错误', '请输入用户名和姓名!', 'error');
 				return;
@@ -168,9 +164,34 @@ export default {
 			}
 			else {
 				//服务器接口
-				this.idCard = '';
-				this.truename = '';
-				this.switchShow('showChange');
+				const result = await this.xcheck();
+				if (result) {
+					this.Swal("成功", "修改成功，请等待管理员审核！", "success")
+					this.idCard = '';
+					this.realname = '';
+					this.switchShow('showChange');
+				}
+			}
+		},
+		async xcheck() {
+			const response = await fetch('', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					username: this.username,
+					id_card: this.idCard,
+					real_name: this.realname
+				})
+			})
+			const data = await response.json();
+			if (data.code == 200) {
+				return true;
+			} else {
+				console.log(data);
+				this.Swal("失败", data.code + ":" + data.desc, 'error');
+				return false;
 			}
 		},
 		change() {  //点击确认，回到登录界面
@@ -216,7 +237,7 @@ export default {
 			<span id="bcmm" :class="showLogin" @click="savePassword">{{ savepassword }}</span>
 			<span id="wjmm" :class="showLogin" @click="find">忘记密码？</span>
 			<input :class="showFind" @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">
-			<input :class="showFind" @keyup.enter="next" v-model="truename" type="text" placeholder="请输入真实姓名">
+			<input :class="showFind" @keyup.enter="next" v-model="realname" type="text" placeholder="请输入真实姓名">
 			<input :class="showFind" @keyup.enter="next" v-model="idCard" type="text" placeholder="请输入身份证号">
 			<button :class="showFind" @click="next">下一步</button>
 			<button :class="showFind" @click="switchShow('showLogin')">返回</button>

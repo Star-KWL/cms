@@ -11,6 +11,7 @@ npm i
 ### 安装sweetalert
 ```
 npm install sweetalert
+npm install vue-cookies --save
 ```
 
 ### 编译项目并启动热重载
