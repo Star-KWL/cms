@@ -8,7 +8,7 @@ npm install
 ```
 npm i
 ```
-### 安装sweetalert
+### 安装 SweetAlert 和 Vue-Coockies
 ```
 npm install sweetalert
 npm install vue-cookies --save
