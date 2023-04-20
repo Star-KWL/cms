@@ -55,6 +55,34 @@ export default {
 			}
 
 		},
+		async test() {
+			const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+				method: 'POST',
+				headers:{},
+				 body: JSON.stringify({title:'111'})
+			});
+			const data = await response.json();
+
+				console.log(data);
+		},
+		async xlogin() {
+			const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					username: this.username,
+					password: this.password
+				})
+			});
+			const data = await response.json();
+			if (data.success) {
+				// 登录成功，更新应用程序状态
+			} else {
+				console.log(data);
+			}
+		},
 		isValidUsername() {
 			const pattern = /^[a-zA-Z0-9_]+$/;
 			return pattern.test(this.username);
@@ -111,23 +139,23 @@ export default {
 		getPassword() {
 			this.username = window.localStorage.getItem('username');
 			this.password = window.localStorage.getItem('password');
-			if ( window.localStorage.getItem == '取消保存' ) {
+			if (window.localStorage.getItem == '取消保存') {
 				this.savepassword = window.localStorage.getItem('savepassword');
 				return;
 			}
-			else{
+			else {
 				window.localStorage.setItem('savepassword', '保存密码');
 				this.savepassword = window.localStorage.getItem('savepassword');
 			}
-			
+
 		},
-		switchShow(show){
+		switchShow(show) {
 			this.showLogin = "hide";
 			this.showFind = "hide";
 			this.showChange = "hide";
-			if (show=='showLogin')this.showLogin = "show";
-			if (show=='showFind')this.showFind = "show";
-			if (show=='showChange')this.showChange = "show";
+			if (show == 'showLogin') this.showLogin = "show";
+			if (show == 'showFind') this.showFind = "show";
+			if (show == 'showChange') this.showChange = "show";
 		},
 		find() {  //点击忘记密码，确认信息
 			this.switchShow('showFind');
@@ -162,7 +190,7 @@ export default {
 				return;
 			}
 			if (this.newpassword === this.newpassword2) {
-				this.Swal('成功', '修改成功!', 'success');
+				this.Swal('成功', '修改请求已发送，请等待管理员审核!', 'success');
 				this.password = '';
 				this.code = '';
 				this.newpassword = '';
@@ -191,7 +219,7 @@ export default {
 			<input :class="showLogin" style="width:150px;" @keyup.enter="login" type="text" v-model="code"
 				placeholder="请输入验证码" />
 			<canvas :class="showLogin" ref="canvas" @click="generateCode"></canvas>
-			<button :class="showLogin" @click="login">登录</button>
+			<button :class="showLogin" @click="test">登录</button>
 			<span id="bcmm" :class="showLogin" @click="savePassword">{{ savepassword }}</span>
 			<span id="wjmm" :class="showLogin" @click="find">忘记密码？</span>
 			<input :class="showFind" @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">
@@ -199,8 +227,10 @@ export default {
 			<input :class="showFind" @keyup.enter="next" v-model="idCard" type="text" placeholder="请输入身份证号">
 			<button :class="showFind" @click="next">下一步</button>
 			<button :class="showFind" @click="switchShow('showLogin')">返回</button>
-			<input style="margin-top: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword" type="password" placeholder="请输入新密码">
-			<input style="margin-bottom: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword2" type="password" placeholder="请再次输入新密码">
+			<input style="margin-top: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword" type="password"
+				placeholder="请输入新密码">
+			<input style="margin-bottom: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword2"
+				type="password" placeholder="请再次输入新密码">
 			<button :class="showChange" @click="change">确认</button>
 			<button :class="showChange" @click="switchShow('showFind')">返回</button>
 
@@ -255,11 +285,11 @@ button:active {
 }
 
 span {
-	width:115px;
+	width: 115px;
 	height: 30px;
 	font-size: 16px;
 	line-height: 30px;
-	display:inline-block;
+	display: inline-block;
 	color: #fff;
 	background-color: #41b883;
 	border-radius: 20px;
@@ -268,7 +298,7 @@ span {
 
 span:hover {
 	cursor: pointer;
-    background-color: #2fd188;
+	background-color: #2fd188;
 	transform: scale(1.1);
 }
 
@@ -324,11 +354,13 @@ canvas {
 .hide {
 	display: none;
 }
-#bccm{
+
+#bccm {
 	margin-right: 20px;
 }
-#wjmm{
-	margin-left:20px;
+
+#wjmm {
+	margin-left: 20px;
 }
 </style>
 
