@@ -12,9 +12,9 @@ export default {
 			code: '',  //输入的验证码
 			savepassword: '保存密码',  //保存密码
 			generatedCode: '',  //要求的验证码
-			showLogin: "show",  //是否显示登录界面
-			showFind: "hide",  //验证界面
-			showChange: "hide",  //修改界面
+			showLogin: true,  //是否显示登录界面
+			showFind: false,  //验证界面
+			showChange: false,  //修改界面
 		}
 	},
 	mounted() {
@@ -52,17 +52,17 @@ export default {
 
 		},
 		async xlogin() {  //调用接口进行用户名和密码验证
-			const response = 
-			await fetch('https://www.fastmock.site/mock/190b43d54318fbf3326b993eb7ca66d0/login/api/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					username: this.username,
-					password: this.password
+			const response =
+				await fetch('https://www.fastmock.site/mock/190b43d54318fbf3326b993eb7ca66d0/login/api/login', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						username: this.username,
+						password: this.password
+					})
 				})
-			})
 			const data = await response.json();
 			if (data.code == 200) {
 				return true;
@@ -128,15 +128,15 @@ export default {
 				this.username = this.$cookies.get('username');
 				this.password = this.$cookies.get('password');
 				this.savepassword = '取消保存';
-			} 
+			}
 		},
 		switchShow(show) {  //切换登录，验证，修改密码界面
-			this.showLogin = "hide";
-			this.showFind = "hide";
-			this.showChange = "hide";
-			if (show == 'showLogin') this.showLogin = "show";
-			if (show == 'showFind') this.showFind = "show";
-			if (show == 'showChange') this.showChange = "show";
+			this.showLogin = false;
+			this.showFind = false;
+			this.showChange = false;
+			if (show == 'showLogin') {this.showLogin = true;}
+			if (show == 'showFind') {this.showFind = true;}
+			if (show == 'showChange') {this.showChange = true;}
 		},
 		find() {  //点击忘记密码，确认信息
 			this.switchShow('showFind');
@@ -161,8 +161,7 @@ export default {
 					this.Swal("成功", "验证成功!", "success")
 					this.switchShow('showChange');
 				}
-				else
-				{
+				else {
 					//报错信息在xcheck中处理，不在这里呈现
 					return;
 				}
@@ -188,6 +187,7 @@ export default {
 				this.Swal("失败", data.code + ":" + data.desc, 'error');
 				return false;
 			}
+
 		},
 		async change() {  //点击确认，向服务端发送修改密码请求，然后回到登录界面
 			if (this.newpassword == '' || this.newpassword2 == '') {
@@ -218,34 +218,48 @@ export default {
 
 
 <template>
-	<div id="signin">
-		<div>
-			<br>
-			<h3 :class="showLogin">登录</h3>
-			<h3 :class="showFind">验证信息</h3>
-			<h3 :class="showChange">修改密码</h3>
-			<input :class="showLogin" @keyup.enter="login" v-model="username" type="text" placeholder="请输入用户名">
-			<input :class="showLogin" @keyup.enter="login" v-model="password" type="password" placeholder="请输入密码">
-			<input :class="showLogin" style="width:150px;" @keyup.enter="login" type="text" v-model="code"
-				placeholder="请输入验证码" />
-			<canvas :class="showLogin" ref="canvas" @click="generateCode"></canvas>
-			<button :class="showLogin" @click="login">登录</button>
-			<span id="bcmm" :class="showLogin" @click="savePassword">{{ savepassword }}</span>
-			<span id="wjmm" :class="showLogin" @click="find">忘记密码？</span>
-			<input :class="showFind" @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">
-			<input :class="showFind" @keyup.enter="next" v-model="realname" type="text" placeholder="请输入真实姓名">
-			<input :class="showFind" @keyup.enter="next" v-model="idCard" type="text" placeholder="请输入身份证号">
-			<button :class="showFind" @click="next">下一步</button>
-			<button :class="showFind" @click="switchShow('showLogin')">返回</button>
-			<input style="margin-top: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword" type="password"
-				placeholder="请输入新密码">
-			<input style="margin-bottom: 30px;" :class="showChange" @keyup.enter="change" v-model="newpassword2"
-				type="password" placeholder="请再次输入新密码">
-			<button :class="showChange" @click="change">确认</button>
-			<button :class="showChange" @click="switchShow('showFind')">返回</button>
-
+	<Transition name="slide-up">
+		<div id="signin" v-show="showLogin">
+			<div>
+				<br>
+				<h3>登录</h3>
+				<input @keyup.enter="login" v-model="username" type="text" placeholder="请输入用户名">
+				<input @keyup.enter="login" v-model="password" type="password" placeholder="请输入密码">
+				<input style="width:150px;" @keyup.enter="login" type="text" v-model="code" placeholder="请输入验证码" />
+				<canvas ref="canvas" @click="generateCode"></canvas>
+				<button @click="login">登录</button>
+				<span id="bcmm" @click="savePassword">{{ savepassword }}</span>
+				<span id="wjmm" @click="find">忘记密码？</span>
+			</div>
 		</div>
-	</div>
+	</Transition>
+	<Transition name="slide-up">
+		<div id="signin" v-if="showFind">
+			<div>
+				<br>
+				<h3>验证信息</h3>
+				<input @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">
+				<input @keyup.enter="next" v-model="realname" type="text" placeholder="请输入真实姓名">
+				<input @keyup.enter="next" v-model="idCard" type="text" placeholder="请输入身份证号">
+				<button @click="next">下一步</button>
+				<button @click="switchShow('showLogin')">返回</button>
+			</div>
+		</div>
+	</Transition>
+	<Transition name="slide-up">
+		<div id="signin" v-if="showChange">
+			<div>
+				<br>
+				<h3>修改密码</h3>
+				<input style="margin-top: 30px;" @keyup.enter="change" v-model="newpassword" type="password"
+					placeholder="请输入新密码">
+				<input style="margin-bottom: 30px;" @keyup.enter="change" v-model="newpassword2" type="password"
+					placeholder="请再次输入新密码">
+				<button @click="change">确认</button>
+				<button @click="switchShow('showFind')">返回</button>
+			</div>
+		</div>
+	</Transition>
 </template>
 
 
@@ -317,11 +331,13 @@ div#signin {
 	background-color: aliceblue;
 	border-radius: 20px;
 	width: 300px;
-	height: 335px;
+	height: 336px;
 	position: absolute;
-	left: 50%;
 	top: 50%;
+	left: 50%;
 	transform: translate(-50%, -50%);
+	/* margin-top: -150px;
+    margin-left: -168px; */
 	box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.2);
 }
 
@@ -371,6 +387,23 @@ canvas {
 
 #wjmm {
 	margin-left: 20px;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+	transition: all 0.45s ease-out;
+}
+
+.slide-up-enter-from {
+	opacity: 0;
+	/* transform: translateY(100px);
+  transform: scale(0.3); */
+}
+
+.slide-up-leave-to {
+	opacity: 0;
+	/* transform: translateY(-100px);
+  transform: scale(1.2); */
 }
 </style>
 
