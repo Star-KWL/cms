@@ -46,7 +46,7 @@ export default {
 						return;
 					}
 					this.Swal("成功", "您已成功登录", "success");
-					window.location.href="#dashboard";
+					window.location.href = "#dashboard";
 				}
 			}
 
@@ -245,52 +245,61 @@ export default {
 
 
 <template>
-	<Transition name="slide-up">
-		<div id="signin" v-show="showLogin">
-			<div>
-				<br>
-				<h3>登录</h3>
-				<input @keyup.enter="login" v-model="username" type="text" placeholder="请输入用户名">
-				<input @keyup.enter="login" v-model="password" type="password" placeholder="请输入密码">
-				<input style="width:150px;" @keyup.enter="login" type="text" v-model="code" placeholder="请输入验证码" />
-				<canvas ref="canvas" @click="generateCode"></canvas>
-				<button @click="login">登录</button>
-				<span id="bcmm" @click="savePassword">{{ savepassword }}</span>
-				<span id="wjmm" @click="find">忘记密码？</span>
+	<div id="background">
+		<Transition name="slide-up">
+			<div id="signin" v-show="showLogin">
+				<div>
+					<br>
+					<h3>登录</h3>
+					<input @keyup.enter="login" v-model="username" type="text" placeholder="请输入用户名">
+					<input @keyup.enter="login" v-model="password" type="password" placeholder="请输入密码">
+					<input style="width:150px;" @keyup.enter="login" type="text" v-model="code" placeholder="请输入验证码" />
+					<canvas ref="canvas" @click="generateCode"></canvas>
+					<button @click="login">登录</button>
+					<span id="bcmm" @click="savePassword">{{ savepassword }}</span>
+					<span id="wjmm" @click="find">忘记密码？</span>
+				</div>
 			</div>
-		</div>
-	</Transition>
-	<Transition name="slide-up">
-		<div id="signin" v-if="showFind">
-			<div>
-				<br>
-				<h3>验证信息</h3>
-				<input @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">
-				<input @keyup.enter="next" v-model="realname" type="text" placeholder="请输入真实姓名">
-				<input @keyup.enter="next" v-model="idCard" type="text" placeholder="请输入身份证号">
-				<button @click="next">下一步</button>
-				<button @click="switchShow('showLogin')">返回</button>
+		</Transition>
+		<Transition name="slide-up">
+			<div id="signin" v-if="showFind">
+				<div>
+					<br>
+					<h3>验证信息</h3>
+					<input @keyup.enter="next" v-model="username" type="text" placeholder="请输入用户名">
+					<input @keyup.enter="next" v-model="realname" type="text" placeholder="请输入真实姓名">
+					<input @keyup.enter="next" v-model="idCard" type="text" placeholder="请输入身份证号">
+					<button @click="next">下一步</button>
+					<button @click="switchShow('showLogin')">返回</button>
+				</div>
 			</div>
-		</div>
-	</Transition>
-	<Transition name="slide-up">
-		<div id="signin" v-if="showChange">
-			<div>
-				<br>
-				<h3>修改密码</h3>
-				<input style="margin-top: 30px;" @keyup.enter="change" v-model="newpassword" type="password"
-					placeholder="请输入新密码">
-				<input style="margin-bottom: 30px;" @keyup.enter="change" v-model="newpassword2" type="password"
-					placeholder="请再次输入新密码">
-				<button @click="change">确认</button>
-				<button @click="switchShow('showFind')">返回</button>
+		</Transition>
+		<Transition name="slide-up">
+			<div id="signin" v-if="showChange">
+				<div>
+					<br>
+					<h3>修改密码</h3>
+					<input style="margin-top: 30px;" @keyup.enter="change" v-model="newpassword" type="password"
+						placeholder="请输入新密码">
+					<input style="margin-bottom: 30px;" @keyup.enter="change" v-model="newpassword2" type="password"
+						placeholder="请再次输入新密码">
+					<button @click="change">确认</button>
+					<button @click="switchShow('showFind')">返回</button>
+				</div>
 			</div>
-		</div>
-	</Transition>
+		</Transition>
+	</div>
 </template>
 
 
 <style scoped>
+div#background{
+	background:
+		linear-gradient(-180deg, #BCC5CE 0%, #929EAD 98%),
+		radial-gradient(at top left, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%);
+	background-blend-mode: screen;
+	height:100%;
+}
 h3 {
 	margin-top: 0px;
 }
@@ -368,17 +377,6 @@ div#signin {
 	box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.2);
 }
 
-body {
-	background:
-		linear-gradient(-180deg, #BCC5CE 0%, #929EAD 98%),
-		radial-gradient(at top left, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%);
-	background-blend-mode: screen;
-}
-
-html,
-body {
-	height: 100%;
-}
 
 .swal-footer {
 	text-align: center;
