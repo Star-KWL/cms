@@ -45,30 +45,31 @@ export default {
 						this.switchShow('showChange');
 						return;
 					}
-					this.Swal("成功", "您已成功登录", "success")
-					window.open('/dashboard', '_self');
+					this.Swal("成功", "您已成功登录", "success");
+					window.location.href="#dashboard";
 				}
 			}
 
 		},
 		async xlogin() {  //调用接口进行用户名和密码验证
 			const response =
-				await fetch('https://www.fastmock.site/mock/190b43d54318fbf3326b993eb7ca66d0/login/api/login', {
+				// await fetch('https://www.fastmock.site/mock/190b43d54318fbf3326b993eb7ca66d0/login/api/login', {
+				await fetch('http://6b1614f5.r3.cpolar.top/login', {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({
-						username: this.username,
-						password: this.password
+						userName: this.username,
+						passWord: this.password
 					})
 				})
 			const data = await response.json();
-			if (data.code == 200) {
+			if (data.code == 1) {
 				return true;
 			} else {
 				console.log(data);
-				this.Swal("失败", data.code + ":" + data.desc, 'error');
+				this.Swal("失败", data.code + ":" + data.message, 'error');
 				return false;
 			}
 		},
@@ -134,9 +135,9 @@ export default {
 			this.showLogin = false;
 			this.showFind = false;
 			this.showChange = false;
-			if (show == 'showLogin') {this.showLogin = true;}
-			if (show == 'showFind') {this.showFind = true;}
-			if (show == 'showChange') {this.showChange = true;}
+			if (show == 'showLogin') { this.showLogin = true; }
+			if (show == 'showFind') { this.showFind = true; }
+			if (show == 'showChange') { this.showChange = true; }
 		},
 		find() {  //点击忘记密码，确认信息
 			this.switchShow('showFind');
@@ -168,23 +169,23 @@ export default {
 			}
 		},
 		async xcheck() {  //校验身份证，姓名
-			const response = await fetch('', {
+			const response = await fetch('http://6b1614f5.r3.cpolar.top/verify', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					username: this.username,
-					id_card: this.idCard,
-					real_name: this.realname
+					userName: this.username,
+					idCard: this.idCard,
+					realName: this.realname
 				})
 			})
 			const data = await response.json();
-			if (data.code == 200) {
+			if (data.code == 1) {
 				return true;
 			} else {
 				console.log(data);
-				this.Swal("失败", data.code + ":" + data.desc, 'error');
+				this.Swal("失败", data.code + ":" + data.message, 'error');
 				return false;
 			}
 
@@ -198,19 +199,45 @@ export default {
 				this.Swal('错误', '不可使用初始密码!', 'error');
 				return;
 			}
-			const result = await this.xcheck(); //再次验证身份证和姓名，增加安全性
-			if (this.newpassword === this.newpassword2 && result) {
-				this.Swal('成功', '修改请求已发送，请等待管理员审核!', 'success');
-				this.password = '';
-				this.code = '';
-				this.newpassword = '';
-				this.newpassword2 = '';
-				this.generateCode();
-				this.switchShow('showLogin')
-			}
-			else {
+			if (this.newpassword != this.newpassword2) {
 				this.Swal('错误', '两次密码输入不一致!', 'error');
+				return;
 			}
+			const isAuth = await this.xcheck(); //再次验证身份证和姓名，增加安全性
+			if (isAuth) {
+				const result = await this.xchange();
+				if (result) {
+					this.Swal('成功', '修改请求已发送，请等待管理员审核!', 'success');
+					this.password = '';
+					this.code = '';
+					this.newpassword = '';
+					this.newpassword2 = '';
+					this.generateCode();
+					this.switchShow('showLogin')
+				}
+
+			}
+		},
+		async xchange() {
+			const response = await fetch('http://6b1614f5.r3.cpolar.top/updatePassword', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					userName: this.username,
+					passWord: this.newpassword
+				})
+			})
+			const data = await response.json();
+			if (data.code == 1) {
+				return true;
+			} else {
+				console.log(data);
+				this.Swal("失败", data.code + " : " + data.message, 'error');
+				return false;
+			}
+
 		},
 	}
 }
@@ -263,7 +290,7 @@ export default {
 </template>
 
 
-<style>
+<style scoped>
 h3 {
 	margin-top: 0px;
 }
