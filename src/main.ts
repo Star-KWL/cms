@@ -15,5 +15,5 @@ app.use(ElementPlus, {
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
   }
-app.config.globalProperties.$cookies = VueCookies
+app.config.globalProperties.$cookies = VueCookies as any
 app.mount('#app')
